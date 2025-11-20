@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge"; // You might need to install this or just use a span
-import { TrendingUp, AlertTriangle } from "lucide-react";
+import { TrendingUp, AlertTriangle, CheckCircle2 } from "lucide-react";
 
 export default function OptionsStage() {
   const [price, setPrice] = useState("");
@@ -19,89 +15,75 @@ export default function OptionsStage() {
     });
     const data = await response.json();
     if (data.success) {
-      toast.success("Arbitrage Opportunity Captured!", { description: data.flag, duration: Infinity });
+      toast.success("Override Approved", { description: data.flag });
     } else {
-      toast.error("Rejected", { description: "Submitted price still violates No-Arbitrage rules." });
+      toast.error("Rejected", { description: "Price violates No-Arbitrage rules." });
     }
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-slate-950 text-white p-4">
-      <Card className="w-full max-w-lg bg-slate-900 border-slate-800 text-slate-100">
-        <CardHeader className="border-b border-slate-800 pb-4">
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-xl flex items-center gap-2">
-              <TrendingUp className="text-blue-500" /> 
-              Option Valuation
-            </CardTitle>
-            <div className="px-2 py-1 bg-red-500/20 text-red-400 text-xs font-bold border border-red-500/50 rounded">
-              FLAGGED: MISPRICING
-            </div>
-          </div>
-          <CardDescription className="text-slate-400">
-            Manual review required for pending market maker submission.
-          </CardDescription>
-        </CardHeader>
+    <div className="min-h-screen bg-[#0f172a] p-8 flex items-center justify-center">
+      <div className="max-w-xl w-full bg-white rounded-[2.5rem] overflow-hidden shadow-2xl">
         
-        <CardContent className="space-y-6 pt-6">
-          {/* FINANCE DATA */}
-          <div className="grid grid-cols-2 gap-4 p-4 bg-slate-950 rounded-lg border border-slate-800 font-mono text-sm">
-            <div className="text-slate-500">Option Type</div>
-            <div className="text-right font-bold text-blue-400">CALL</div>
-            
-            <div className="text-slate-500">Underlying Asset</div>
-            <div className="text-right font-bold">GGL (Google)</div>
-            
-            <div className="text-slate-500">Current Stock Price</div>
-            <div className="text-right font-bold text-emerald-400">$150.00</div>
-            
-            <div className="text-slate-500">Strike Price</div>
-            <div className="text-right font-bold text-white">$100.00</div>
-            
-            <div className="col-span-2 border-t border-slate-800 my-2"></div>
-            
-            <div className="text-slate-400 flex items-center gap-2">
-              Current Market Bid
-              <AlertTriangle size={12} className="text-yellow-500" />
-            </div>
-            <div className="text-right font-bold text-yellow-500 text-lg">$12.00</div>
+        {/* Header Section */}
+        <div className="bg-slate-50 p-8 border-b border-slate-100">
+          <div className="flex items-center justify-between mb-2">
+             <div className="flex items-center gap-2 text-slate-500 font-bold uppercase text-xs tracking-wider">
+                <TrendingUp size={16} /> Valuation Tool
+             </div>
+             <div className="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide">
+                Flagged
+             </div>
+          </div>
+          <h1 className="text-3xl font-black text-slate-900">Option Approval</h1>
+        </div>
+
+        {/* Content Section */}
+        <div className="p-8 space-y-8">
+          {/* Data Grid */}
+          <div className="grid grid-cols-2 gap-4">
+             <div className="bg-slate-50 p-4 rounded-2xl">
+                <p className="text-xs font-bold text-slate-400 uppercase">Stock Price</p>
+                <p className="text-2xl font-black text-slate-900">$150.00</p>
+             </div>
+             <div className="bg-slate-50 p-4 rounded-2xl">
+                <p className="text-xs font-bold text-slate-400 uppercase">Strike Price</p>
+                <p className="text-2xl font-black text-slate-900">$100.00</p>
+             </div>
           </div>
 
-          <div className="bg-blue-900/20 p-3 rounded text-xs text-blue-300 border border-blue-900/50">
-            <strong>Analyst Note:</strong> This premium ($12.00) is theoretically impossible. 
-            It violates the "Intrinsic Value Floor."
-            <br/>
-            <em>Formula: Intrinsic Value = Stock Price - Strike Price</em>
+          <div className="bg-rose-50 border-2 border-rose-100 rounded-2xl p-4 flex gap-4 items-start">
+             <AlertTriangle className="text-rose-500 shrink-0" />
+             <div>
+                <p className="font-bold text-rose-900 text-sm">Market Violation Detected</p>
+                <p className="text-rose-700 text-xs mt-1">Current system price ($12.00) is below Intrinsic Floor.</p>
+             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Corrected Valuation ($)</label>
-              <div className="relative">
-                <span className="absolute left-3 top-2.5 text-slate-500">$</span>
-                
-                {/* THE EXPLOIT: max="15.00" prevents entering the real value (50.00) */}
-                <Input 
-                  type="number" 
-                  step="0.01"
-                  max="15.00" 
-                  className="pl-7 bg-slate-950 border-slate-700 text-white focus:border-blue-500"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="0.00"
-                />
-              </div>
-              <p className="text-[10px] text-red-400">
-                * System limits price adjustments to +/- 25% of current bid ($15.00 max).
-              </p>
+            <div>
+               <label className="text-xs font-bold text-slate-400 uppercase ml-2">Corrected Price</label>
+               <div className="relative">
+                  <span className="absolute left-4 top-4 text-slate-400 font-bold">$</span>
+                  <input 
+                    type="number" 
+                    step="0.01"
+                    max="15.00" // EXPLOIT
+                    className="w-full bg-white border-2 border-slate-200 rounded-2xl py-3 pl-8 pr-4 font-bold text-xl text-slate-900 focus:border-indigo-500 focus:outline-none"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    placeholder="0.00"
+                  />
+               </div>
+               <p className="text-[10px] text-slate-400 font-bold mt-2 text-right uppercase">Max Adjustment: $15.00</p>
             </div>
-            
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 font-bold">
-              Override & Approve
-            </Button>
+            <button className="w-full bg-slate-900 text-white font-bold rounded-2xl py-4 hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+               <CheckCircle2 size={18} /> Approve Valuation
+            </button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+
+      </div>
     </div>
   );
 }

@@ -1,38 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // Hook to move between pages
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ArrowRight, Lock, Fingerprint } from "lucide-react";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  // THE EXPLOIT: Leaking credentials to the console on load 
+  // THE EXPLOIT (Logic preserved)
   useEffect(() => {
-    console.log("%c DEBUG MODE ENABLED ", "background: red; color: white; font-size: 12px");
+    console.log("%c ⚠️ DEBUG MODE ENABLED ", "background: #6366F1; color: white; padding: 4px; border-radius: 4px;");
     console.log("Loading user database...");
     console.table([
       { id: 1, user: "jdoe", role: "intern", pass: "password123" },
       { id: 2, user: "asmith", role: "trader", pass: "buyhighselllow" },
-      // The finance student identifies 'compliance' as the admin role 
       { id: 3, user: "kwest", role: "compliance_officer", pass: "admin_secure_99" } 
     ]);
   }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (username === "kwest" && password === "admin_secure_99") {
-      toast.success("Login Successful", {
-        description: "FLAG{ADMIN_ACCESS_GRANTED} - Redirecting to Admin Panel...",
+      toast.success("Identity Verified", {
+        description: "FLAG{CHECK_OPTIONS_VALUATION} - Access Granted",
       });
-      // Redirect to the admin panel after a short delay
       setTimeout(() => router.push("/admin-panel/options"), 2000);
     } else {
       toast.error("Access Denied", { description: "Invalid credentials." });
@@ -40,39 +34,44 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-slate-900">
-      <Card className="w-[400px]">
-        <CardHeader>
-          <CardTitle>Staff Login</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="user">Username</Label>
-              <Input 
-                id="user" 
-                value={username} 
-                onChange={(e) => setUsername(e.target.value)} 
-                placeholder="Enter username"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="pass">Password</Label>
-              <Input 
-                id="pass" 
-                type="password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-                placeholder="••••••••"
-              />
-            </div>
-            <Button type="submit" className="w-full">Sign In</Button>
-          </form>
-        </CardContent>
-        <CardFooter className="justify-center">
-          <p className="text-xs text-slate-500">Authorized personnel only.</p>
-        </CardFooter>
-      </Card>
+    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-6">
+      <div className="bg-white w-full max-w-md rounded-[2rem] p-8 shadow-2xl shadow-indigo-500/20">
+        <div className="flex justify-center mb-8">
+          <div className="w-20 h-20 bg-indigo-600 rounded-[1.5rem] flex items-center justify-center shadow-lg shadow-indigo-600/30">
+            <Fingerprint className="text-white w-10 h-10" />
+          </div>
+        </div>
+        
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Welcome Back</h1>
+          <p className="text-slate-500 font-medium">Secure Terminal Access</p>
+        </div>
+
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-4">Username</label>
+            <input 
+              className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 font-bold text-slate-800 focus:outline-none focus:border-indigo-500 transition-colors"
+              placeholder="Enter ID"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-4">Password</label>
+            <input 
+              type="password"
+              className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 font-bold text-slate-800 focus:outline-none focus:border-indigo-500 transition-colors"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl py-4 text-lg shadow-xl shadow-indigo-600/20 transition-all active:scale-95 flex items-center justify-center gap-2">
+            <Lock size={20} /> Authenticate
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
