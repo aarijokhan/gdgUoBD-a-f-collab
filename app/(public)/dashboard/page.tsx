@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react"; // Import useRef
 import { toast } from "sonner";
 import { 
   Search, Bell, Settings, Lock, Activity, Zap, 
@@ -35,16 +35,30 @@ const OrderBookRow = ({ price, amount, total, type }: any) => (
 
 export default function DashboardPage() {
   const [shares, setShares] = useState("");
-  const [time, setTime] = useState(new Date());
+  const [time, setTime] = useState<Date | null>(null);
+  
+  // 1. CREATE REF FOR BUTTON
+  const buyButtonRef = useRef<HTMLButtonElement>(null);
 
   // CTF LOGIC
   const STOCK_PRICE = 50.00;
   const TARGET_PROFIT = 2500;
 
-  // Clock for realism
+  // Clock Logic
   useEffect(() => {
+    setTime(new Date());
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  // 2. APPLY THE LOCK MANUALLY
+  // This adds the 'disabled' attribute to the DOM *after* React renders.
+  // This tricks React into keeping the onClick listener active, so when
+  // the user deletes the attribute in DevTools, the click actually works.
+  useEffect(() => {
+    if (buyButtonRef.current) {
+      buyButtonRef.current.setAttribute("disabled", "true");
+    }
   }, []);
 
   const handleBuy = async () => {
@@ -97,7 +111,7 @@ export default function DashboardPage() {
       {/* --- MAIN CONTENT GRID --- */}
       <div className="flex-1 grid grid-cols-12 overflow-hidden">
         
-        {/* COL 1: WATCHLIST (Left Sidebar) */}
+        {/* COL 1: WATCHLIST */}
         <aside className="hidden lg:block col-span-2 border-r border-slate-800 bg-[#0f141c] flex flex-col">
            <div className="p-3 border-b border-slate-800 flex justify-between items-center">
               <span className="text-xs font-bold uppercase tracking-wider">Watchlist</span>
@@ -112,7 +126,7 @@ export default function DashboardPage() {
            </div>
         </aside>
 
-        {/* COL 2: CHART & ORDER BOOK (Middle) */}
+        {/* COL 2: CHART & ORDER BOOK */}
         <main className="col-span-12 lg:col-span-7 flex flex-col border-r border-slate-800">
            
            {/* Chart Header */}
@@ -136,7 +150,7 @@ export default function DashboardPage() {
               </div>
            </div>
 
-           {/* The Chart Area (Visual Only) */}
+           {/* The Chart Area */}
            <div className="flex-1 bg-[#0b0e14] relative p-4 flex items-center justify-center border-b border-slate-800">
               {/* Grid Lines */}
               <div className="absolute inset-0 grid grid-cols-6 grid-rows-4 pointer-events-none">
@@ -167,7 +181,7 @@ export default function DashboardPage() {
               </div>
            </div>
 
-           {/* Positions / Bottom Panel */}
+           {/* Positions Panel */}
            <div className="h-48 bg-[#0f141c] flex flex-col">
               <div className="flex border-b border-slate-800">
                  <button className="px-4 py-2 text-xs font-bold text-indigo-400 border-b-2 border-indigo-400 bg-indigo-500/5">Open Orders</button>
@@ -183,7 +197,7 @@ export default function DashboardPage() {
         {/* COL 3: ORDER ENTRY (Right Sidebar) */}
         <aside className="col-span-12 lg:col-span-3 bg-[#0f141c] flex flex-col">
            
-           {/* ORDER ENTRY WIDGET (THE PUZZLE) */}
+           {/* ORDER ENTRY WIDGET */}
            <div className="p-4 border-b border-slate-800">
               <div className="bg-amber-400 text-slate-900 rounded-t-xl p-3 flex justify-between items-center">
                  <span className="font-black text-xs uppercase tracking-wider flex items-center gap-1">
@@ -234,10 +248,11 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    {/* THE EXPLOIT BUTTON */}
+                    {/* THE EXPLOIT BUTTON - FIXED */}
                     <button 
+                        ref={buyButtonRef} // <-- 3. ATTACH REF
                         onClick={handleBuy}
-                        disabled={true} 
+                        // disabled={true} <-- REMOVE THIS
                         className="w-full bg-amber-400 hover:bg-amber-300 text-slate-900 font-black py-3 rounded-lg shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all mt-2"
                     >
                         <Lock size={14} /> Place Buy Order
@@ -246,7 +261,7 @@ export default function DashboardPage() {
               </div>
            </div>
 
-           {/* ORDER BOOK (Visual Filler) */}
+           {/* ORDER BOOK */}
            <div className="flex-1 overflow-hidden flex flex-col">
               <div className="px-4 py-2 border-b border-slate-800 text-[10px] font-bold text-slate-500 uppercase tracking-wider flex justify-between">
                  <span>Price(USD)</span>
@@ -269,14 +284,14 @@ export default function DashboardPage() {
         </aside>
       </div>
       
-      {/* FOOTER STATUS BAR */}
+      {/* FOOTER */}
       <footer className="h-6 bg-[#0b0e14] border-t border-slate-800 flex items-center px-4 justify-between text-[10px] font-mono text-slate-500 shrink-0">
          <div className="flex gap-4">
             <span className="text-emerald-500 flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Operational</span>
             <span>Latency: 24ms</span>
          </div>
          <div>
-            {time.toLocaleTimeString()} UTC
+            {time ? time.toLocaleTimeString() : "Loading..."} UTC
          </div>
       </footer>
     </div>
