@@ -5,7 +5,7 @@ const SOLUTIONS = {
   // Stage 1: Solve for 50 shares
   stage1: { 
     answer: 50, 
-    flag: "FLAG{NEXT_TARGET_IS_PORTFOLIO_PAGE}" // Guides them to /portfolio
+    flag: "FLAG{NEXT_TARGET_IS_trade-terminal_PAGE}" // Guides them to /trade-terminal (Stage 2)
   },
   
   // Stage 2: Solve for the 50,000 accounting error (after they reach this page)

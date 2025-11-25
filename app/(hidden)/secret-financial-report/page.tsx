@@ -2,90 +2,169 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { TrendingUp, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Database, Server, ShieldAlert, Lock, Terminal, ArrowRight } from "lucide-react";
 
-export default function OptionsStage() {
-  const [price, setPrice] = useState("");
+export default function SecretReportPage() {
+  const [answer, setAnswer] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const response = await fetch("/api/verify-flag", {
-      method: "POST",
-      body: JSON.stringify({ stage: "stage4", input: Number(price) }),
-    });
-    const data = await response.json();
-    if (data.success) {
-      toast.success("Override Approved", { description: data.flag });
-    } else {
-      toast.error("Rejected", { description: "Price violates No-Arbitrage rules." });
+    setIsLoading(true);
+    try {
+        const response = await fetch("/api/verify-flag", {
+          method: "POST",
+          body: JSON.stringify({ stage: "stage2", input: Number(answer) }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          toast.success("LEDGER REBALANCED", { 
+            description: (
+                <div className="space-y-2 font-mono">
+                    <p>DATABASE INTEGRITY RESTORED.</p>
+                    <div className="bg-emerald-950/50 text-emerald-400 border border-emerald-900 p-3 rounded text-[10px]">
+                        <span className="text-neutral-500">FLAG:</span> {data.flag}
+                        <br/>
+                        <span className="text-emerald-600 uppercase mt-1 block font-bold">
+                            &gt;&gt; PROCEED TO LOGIN AS 'kwest'
+                        </span>
+                    </div>
+                </div>
+            ), 
+            duration: Infinity,
+            action: {
+                label: "RETURN TO ROOT",
+                onClick: () => window.location.href = "/login"
+            }
+          });
+        } else {
+          toast.error("RECONCILIATION FAILED", { 
+            description: "ERR_CHECKSUM_MISMATCH: Variance incorrectly calculated." 
+          });
+        }
+    } catch (err) {
+        toast.error("SYSTEM ERROR");
+    } finally {
+        setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] p-8 flex items-center justify-center">
-      <div className="max-w-xl w-full bg-white rounded-[2.5rem] overflow-hidden shadow-2xl">
+    <div className="min-h-screen bg-black text-neutral-400 font-mono flex items-center justify-center p-6">
+      
+      {/* MAIN CARD CONTAINER - NEUTRAL DARK BACKGROUND */}
+      <div className="max-w-3xl w-full border border-neutral-800 bg-[#050505] shadow-2xl relative overflow-hidden">
         
-        {/* Header Section */}
-        <div className="bg-slate-50 p-8 border-b border-slate-100">
-          <div className="flex items-center justify-between mb-2">
-             <div className="flex items-center gap-2 text-slate-500 font-bold uppercase text-xs tracking-wider">
-                <TrendingUp size={16} /> Valuation Tool
-             </div>
-             <div className="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide">
-                Flagged
-             </div>
-          </div>
-          <h1 className="text-3xl font-black text-slate-900">Option Approval</h1>
+        {/* HEADER */}
+        <div className="h-12 bg-neutral-900 border-b border-neutral-800 flex items-center justify-between px-6">
+            <div className="flex items-center gap-2 text-amber-500">
+                <Terminal size={16} />
+                <span className="font-bold text-xs tracking-widest uppercase">Secure_Ledger_View // v2.4</span>
+            </div>
+            <div className="flex items-center gap-2 text-[10px] text-rose-500 font-bold uppercase bg-rose-950/10 px-2 py-1 border border-rose-900/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                Restricted Access
+            </div>
         </div>
 
-        {/* Content Section */}
+        {/* MAIN CONTENT */}
         <div className="p-8 space-y-8">
-          {/* Data Grid */}
-          <div className="grid grid-cols-2 gap-4">
-             <div className="bg-slate-50 p-4 rounded-2xl">
-                <p className="text-xs font-bold text-slate-400 uppercase">Stock Price</p>
-                <p className="text-2xl font-black text-slate-900">$150.00</p>
-             </div>
-             <div className="bg-slate-50 p-4 rounded-2xl">
-                <p className="text-xs font-bold text-slate-400 uppercase">Strike Price</p>
-                <p className="text-2xl font-black text-slate-900">$100.00</p>
-             </div>
-          </div>
-
-          <div className="bg-rose-50 border-2 border-rose-100 rounded-2xl p-4 flex gap-4 items-start">
-             <AlertTriangle className="text-rose-500 shrink-0" />
-             <div>
-                <p className="font-bold text-rose-900 text-sm">Market Violation Detected</p>
-                <p className="text-rose-700 text-xs mt-1">Current system price ($12.00) is below Intrinsic Floor.</p>
-             </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-               <label className="text-xs font-bold text-slate-400 uppercase ml-2">Corrected Price</label>
-               <div className="relative">
-                  <span className="absolute left-4 top-4 text-slate-400 font-bold">$</span>
-                  
-                  {/* --- THE EXPLOIT IS HERE --- */}
-                  {/* Look for max="15.00" below */}
-                  <input 
-                    type="number" 
-                    step="0.01"
-                    max="15.00" // <--- THIS IS THE ATTRIBUTE TO DELETE IN DEVTOOLS
-                    className="w-full bg-white border-2 border-slate-200 rounded-2xl py-3 pl-8 pr-4 font-bold text-xl text-slate-900 focus:border-indigo-500 focus:outline-none"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    placeholder="0.00"
-                  />
-                  {/* --------------------------- */}
-               
-               </div>
-               <p className="text-[10px] text-slate-400 font-bold mt-2 text-right uppercase">Max Adjustment: $15.00</p>
+            
+            {/* THE PUZZLE: RAW JSON DUMP */}
+            <div className="space-y-2">
+                <div className="flex justify-between items-end">
+                    <div className="text-[10px] uppercase tracking-widest text-neutral-500 flex items-center gap-2">
+                        <Server size={12} /> SYSTEM_DUMP: GL_Q3_FINAL.json
+                    </div>
+                    <div className="text-[10px] text-neutral-600">SIZE: 4KB</div>
+                </div>
+                
+                {/* The JSON Block - Pure Black Background */}
+                <div className="bg-black border border-neutral-800 p-6 text-xs relative group font-mono shadow-inner">
+                    {/* Scanline effect */}
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 pointer-events-none bg-[length:100%_2px,3px_100%] opacity-20"></div>
+                    
+                    <pre className="whitespace-pre-wrap text-neutral-400 leading-relaxed relative z-20">
+{`{
+  "meta": {
+    "report_id": "AUDIT_CASE_882",
+    "timestamp": "2025-11-24T14:30:00Z",
+    "security_level": "L5_CLASSIFIED"
+  },
+  "ledger_data": {
+    "fiscal_period": "Q3_2025",
+    "currency": "BUX",
+    "entries": {
+      "total_assets":      500000.00,
+      "total_liabilities": 200000.00,
+      "shareholder_equity": 250000.00
+    }
+  },
+  "integrity_check": {
+    "checksum": "FAIL",
+    "error_code": "BALANCE_SHEET_INEQUALITY",
+    "message": "WOMP WOMP! Get your financials in order."
+  }
+}`}
+                    </pre>
+                    {/* Blinking cursor */}
+                    <div className="absolute bottom-6 left-4 w-2 h-4 bg-amber-500/50 animate-pulse z-20"></div>
+                </div>
             </div>
-            <button className="w-full bg-slate-900 text-white font-bold rounded-2xl py-4 hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
-               <CheckCircle2 size={18} /> Approve Valuation
-            </button>
-          </form>
+
+            {/* INPUT AREA */}
+            <div className="border-t border-neutral-800 pt-6">
+                <div className="flex items-start gap-3 mb-6">
+                    <div className="p-2 bg-amber-500/10 border border-amber-500/20">
+                        <ShieldAlert className="text-amber-500" size={18} />
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-bold text-white uppercase tracking-wide">Manual Adjustment Required</h3>
+                        <p className="text-xs text-neutral-500 mt-1 max-w-lg leading-relaxed">
+                            Automatic reconciliation failed due to checksum error. 
+                        </p>
+                    </div>
+                </div>
+
+                <form onSubmit={handleSubmit} className="flex items-center border border-neutral-700 bg-black p-1 gap-1">
+                    <div className="px-4 py-3 bg-neutral-900 border border-neutral-800 text-neutral-500 text-[10px] font-bold uppercase tracking-widest">
+                        INPUT_VARIANCE
+                    </div>
+                    <div className="relative flex-1">
+                        <span className="absolute left-4 top-3 text-neutral-600 font-bold">$</span>
+                        <input 
+                            type="number" 
+                            autoFocus
+                            placeholder="0.00" 
+                            className="w-full bg-transparent pl-8 pr-4 py-2 text-white font-mono text-lg focus:outline-none placeholder:text-neutral-800"
+                            value={answer}
+                            onChange={(e) => setAnswer(e.target.value)}
+                        />
+                    </div>
+                    <button 
+                        type="submit"
+                        disabled={isLoading}
+                        className="px-8 py-3 bg-amber-600 hover:bg-amber-500 text-black text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2"
+                    >
+                        {isLoading ? "CALCULATING..." : <>COMMIT <ArrowRight size={12} /></>}
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+        {/* FOOTER */}
+        <div className="bg-neutral-900 p-2 text-center border-t border-neutral-800 flex justify-between px-6">
+            <div className="flex items-center gap-2 text-[10px] text-neutral-600 font-mono">
+                <Database size={10} />
+                HOST: AWS_US_EAST_1
+            </div>
+            <div className="flex items-center gap-2 text-[10px] text-neutral-600 font-mono">
+                <Lock size={10} />
+                TLS_1.3_ENCRYPTED
+            </div>
         </div>
 
       </div>

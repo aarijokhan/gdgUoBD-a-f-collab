@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { TrendingUp, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { TrendingUp, AlertTriangle, Lock, Terminal, ShieldAlert } from "lucide-react";
 
 export default function OptionsStage() {
   const [price, setPrice] = useState("");
@@ -15,70 +15,102 @@ export default function OptionsStage() {
     });
     const data = await response.json();
     if (data.success) {
-      toast.success("Override Approved", { description: data.flag });
+      toast.success("VALUATION OVERRIDE APPROVED", { description: data.flag });
     } else {
-      toast.error("Rejected", { description: "Price violates No-Arbitrage rules." });
+      toast.error("REJECTED", { description: "Price violates No-Arbitrage rules." });
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] p-8 flex items-center justify-center">
-      <div className="max-w-xl w-full bg-white rounded-[2.5rem] overflow-hidden shadow-2xl">
+    <div className="min-h-screen bg-black text-neutral-400 font-mono flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl border border-neutral-800 bg-[#050505]">
         
-        {/* Header Section */}
-        <div className="bg-slate-50 p-8 border-b border-slate-100">
-          <div className="flex items-center justify-between mb-2">
-             <div className="flex items-center gap-2 text-slate-500 font-bold uppercase text-xs tracking-wider">
-                <TrendingUp size={16} /> Valuation Tool
-             </div>
-             <div className="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide">
-                Flagged
-             </div>
+        {/* Header */}
+        <div className="h-12 bg-neutral-900 border-b border-neutral-800 flex items-center justify-between px-4">
+          <div className="flex items-center gap-2 text-amber-500">
+            <Terminal size={16} />
+            <span className="font-bold text-xs tracking-widest">OPTION_PRICING_MODEL_V4</span>
           </div>
-          <h1 className="text-3xl font-black text-slate-900">Option Approval</h1>
+          <div className="text-[10px] text-neutral-500">SECURE_NODE_77</div>
         </div>
 
-        {/* Content Section */}
+        {/* Content */}
         <div className="p-8 space-y-8">
-          {/* Data Grid */}
-          <div className="grid grid-cols-2 gap-4">
-             <div className="bg-slate-50 p-4 rounded-2xl">
-                <p className="text-xs font-bold text-slate-400 uppercase">Stock Price</p>
-                <p className="text-2xl font-black text-slate-900">$150.00</p>
-             </div>
-             <div className="bg-slate-50 p-4 rounded-2xl">
-                <p className="text-xs font-bold text-slate-400 uppercase">Strike Price</p>
-                <p className="text-2xl font-black text-slate-900">$100.00</p>
-             </div>
+          
+          {/* Asset Data Grid */}
+          <div>
+            <h3 className="text-[10px] uppercase tracking-widest text-neutral-600 mb-2">Underlying Asset</h3>
+            <div className="grid grid-cols-4 border border-neutral-800 bg-black text-sm">
+              <div className="p-3 border-r border-neutral-800">
+                <div className="text-[10px] text-neutral-500 mb-1">TICKER</div>
+                <div className="font-bold text-white">GGL</div>
+              </div>
+              <div className="p-3 border-r border-neutral-800">
+                <div className="text-[10px] text-neutral-500 mb-1">SPOT PRICE</div>
+                <div className="font-bold text-white">$150.00</div>
+              </div>
+              <div className="p-3 border-r border-neutral-800">
+                <div className="text-[10px] text-neutral-500 mb-1">STRIKE</div>
+                <div className="font-bold text-amber-500">$100.00</div>
+              </div>
+              <div className="p-3">
+                <div className="text-[10px] text-neutral-500 mb-1">TYPE</div>
+                <div className="font-bold text-white">CALL</div>
+              </div>
+            </div>
           </div>
 
-          <div className="bg-rose-50 border-2 border-rose-100 rounded-2xl p-4 flex gap-4 items-start">
-             <AlertTriangle className="text-rose-500 shrink-0" />
+          {/* Alert Box */}
+          <div className="bg-red-950/10 border border-red-900/30 p-4 flex gap-4 items-start">
+             <ShieldAlert className="text-red-600 shrink-0" size={20} />
              <div>
-                <p className="font-bold text-rose-900 text-sm">Market Violation Detected</p>
-                <p className="text-rose-700 text-xs mt-1">Current system price ($12.00) is below Intrinsic Floor.</p>
+                <p className="font-bold text-red-500 text-xs tracking-wider mb-1">ARBITRAGE VIOLATION DETECTED</p>
+                <p className="text-red-400/60 text-xs leading-relaxed">
+                  System Price ($12.00) is below Intrinsic Floor ($50.00). <br/>
+                  Manual override required to prevent free-money exploit.
+                </p>
              </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* COMEDIC RISK METRICS */}
+<div className="grid grid-cols-3 gap-px bg-neutral-800 border border-neutral-800 mb-6">
+    <div className="bg-black p-3 text-center">
+        <div className="text-[9px] text-neutral-500 uppercase">Implied Volatility</div>
+        <div className="text-amber-500 font-mono text-xs">COOKED</div>
+    </div>
+    <div className="bg-black p-3 text-center">
+        <div className="text-[9px] text-neutral-500 uppercase">Theta (Decay)</div>
+        <div className="text-rose-500 font-mono text-xs">I DONT EVEN KNOW WHAT THIS MEANS</div>
+    </div>
+    <div className="bg-black p-3 text-center">
+        <div className="text-[9px] text-neutral-500 uppercase">Analyst Rating</div>
+        <div className="text-white font-mono text-xs">TRUST ME BRO</div>
+    </div>
+</div>
+
+          {/* Override Form */}
+          <form onSubmit={handleSubmit} className="space-y-4 border-t border-neutral-800 pt-6">
             <div>
-               <label className="text-xs font-bold text-slate-400 uppercase ml-2">Corrected Price</label>
-               <div className="relative">
-                  <span className="absolute left-4 top-4 text-slate-400 font-bold">$</span>
+               <div className="flex justify-between mb-2">
+                 <label className="text-xs font-bold text-white uppercase">Manual Valuation Input</label>
+                 <span className="text-[10px] text-red-500 font-bold">SYSTEM LOCK: MAX $15.00</span>
+               </div>
+               
+               <div className="relative group">
+                  <span className="absolute left-4 top-3 text-neutral-500 font-mono">$</span>
                   <input 
                     type="number" 
                     step="0.01"
-                    max="15.00" // EXPLOIT
-                    className="w-full bg-white border-2 border-slate-200 rounded-2xl py-3 pl-8 pr-4 font-bold text-xl text-slate-900 focus:border-indigo-500 focus:outline-none"
+                    max="15.00" // <--- THE EXPLOIT IS HERE
+                    className="w-full bg-black border border-neutral-700 p-3 pl-8 text-white font-mono focus:border-amber-500 focus:outline-none transition-colors placeholder:text-neutral-800"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder="0.00"
                   />
                </div>
-               <p className="text-[10px] text-slate-400 font-bold mt-2 text-right uppercase">Max Adjustment: $15.00</p>
             </div>
-            <button className="w-full bg-slate-900 text-white font-bold rounded-2xl py-4 hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
-               <CheckCircle2 size={18} /> Approve Valuation
+            <button className="w-full bg-amber-600 hover:bg-amber-500 text-black font-bold text-xs py-4 uppercase tracking-widest flex items-center justify-center gap-2">
+               <Lock size={14} /> Authorize Correction
             </button>
           </form>
         </div>
