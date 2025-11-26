@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Database, Server, ShieldAlert, Lock, Terminal, ArrowRight } from "lucide-react";
+import { Database, Server, ShieldAlert, Lock, Terminal, ArrowRight, CheckCircle2, User } from "lucide-react";
 
 export default function SecretReportPage() {
   const [answer, setAnswer] = useState("");
@@ -21,21 +21,36 @@ export default function SecretReportPage() {
 
         if (data.success) {
           toast.success("LEDGER REBALANCED", { 
+            // UPDATED NOTIFICATION DESIGN
             description: (
-                <div className="space-y-2 font-mono">
-                    <p>DATABASE INTEGRITY RESTORED.</p>
-                    <div className="bg-emerald-950/50 text-emerald-400 border border-emerald-900 p-3 rounded text-[10px]">
-                        <span className="text-neutral-500">FLAG:</span> {data.flag}
-                        <br/>
-                        <span className="text-emerald-600 uppercase mt-1 block font-bold">
-                            &gt;&gt; PROCEED TO LOGIN AS 'kwest'
-                        </span>
+                <div className="space-y-3 font-mono mt-2 w-full">
+                    <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                        <CheckCircle2 size={12} /> Database Consistency: OK
+                    </div>
+                    
+                    {/* FLAG BOX */}
+                    <div className="bg-black border border-emerald-800 p-3 rounded-md relative group">
+                        <div className="absolute top-0 left-0 bottom-0 w-1 bg-emerald-600"></div>
+                        <p className="text-[10px] text-slate-500 uppercase mb-1">System Flag Decrypted</p>
+                        <p className="text-emerald-300 font-bold text-xs break-all">{data.flag}</p>
+                    </div>
+
+                    {/* HINT BOX (High Contrast) */}
+                    <div className="bg-amber-950/20 border border-amber-500/30 p-3 rounded-md">
+                        <div className="flex items-center gap-1.5 text-amber-500 text-[10px] uppercase font-bold mb-1">
+                            <User size={10} /> Next Directive
+                        </div>
+                        <p className="text-amber-200 text-xs">
+                            Admin credentials identified. <br/>
+                            <span className="font-bold text-white">&gt; LOGIN AS USER: </span>
+                            <span className="bg-amber-500/20 text-amber-300 px-1.5 rounded border border-amber-500/30 font-bold">kwest</span>
+                        </p>
                     </div>
                 </div>
             ), 
             duration: Infinity,
             action: {
-                label: "RETURN TO ROOT",
+                label: "RETURN TO LOGIN",
                 onClick: () => window.location.href = "/login"
             }
           });
@@ -52,18 +67,17 @@ export default function SecretReportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-neutral-400 font-mono flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#0b0e14] text-slate-300 font-mono flex items-center justify-center p-6">
       
-      {/* MAIN CARD CONTAINER - NEUTRAL DARK BACKGROUND */}
-      <div className="max-w-3xl w-full border border-neutral-800 bg-[#050505] shadow-2xl relative overflow-hidden">
+      <div className="max-w-3xl w-full border border-neutral-800 bg-[#0f141c] shadow-2xl relative overflow-hidden">
         
         {/* HEADER */}
-        <div className="h-12 bg-neutral-900 border-b border-neutral-800 flex items-center justify-between px-6">
+        <div className="h-12 bg-[#0b0e14] border-b border-neutral-800 flex items-center justify-between px-6">
             <div className="flex items-center gap-2 text-amber-500">
                 <Terminal size={16} />
                 <span className="font-bold text-xs tracking-widest uppercase">Secure_Ledger_View // v2.4</span>
             </div>
-            <div className="flex items-center gap-2 text-[10px] text-rose-500 font-bold uppercase bg-rose-950/10 px-2 py-1 border border-rose-900/20">
+            <div className="flex items-center gap-2 text-[10px] text-rose-500 font-bold uppercase bg-rose-950/20 px-2 py-1 rounded border border-rose-900/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
                 Restricted Access
             </div>
@@ -75,15 +89,14 @@ export default function SecretReportPage() {
             {/* THE PUZZLE: RAW JSON DUMP */}
             <div className="space-y-2">
                 <div className="flex justify-between items-end">
-                    <div className="text-[10px] uppercase tracking-widest text-neutral-500 flex items-center gap-2">
+                    <div className="text-[10px] uppercase tracking-widest text-slate-500 flex items-center gap-2">
                         <Server size={12} /> SYSTEM_DUMP: GL_Q3_FINAL.json
                     </div>
-                    <div className="text-[10px] text-neutral-600">SIZE: 4KB</div>
+                    <div className="text-[10px] text-slate-600">SIZE: 4KB</div>
                 </div>
                 
-                {/* The JSON Block - Pure Black Background */}
-                <div className="bg-black border border-neutral-800 p-6 text-xs relative group font-mono shadow-inner">
-                    {/* Scanline effect */}
+                {/* The JSON Block */}
+                <div className="bg-[#050505] border border-neutral-800 p-6 text-xs relative group font-mono shadow-inner">
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 pointer-events-none bg-[length:100%_2px,3px_100%] opacity-20"></div>
                     
                     <pre className="whitespace-pre-wrap text-neutral-400 leading-relaxed relative z-20">
@@ -95,7 +108,7 @@ export default function SecretReportPage() {
   },
   "ledger_data": {
     "fiscal_period": "Q3_2025",
-    "currency": "BUX",
+    "currency": "USD",
     "entries": {
       "total_assets":      500000.00,
       "total_liabilities": 200000.00,
@@ -105,11 +118,10 @@ export default function SecretReportPage() {
   "integrity_check": {
     "checksum": "FAIL",
     "error_code": "BALANCE_SHEET_INEQUALITY",
-    "message": "WOMP WOMP! Get your financials in order."
+    "message": "Assets != Liabilities + Equity"
   }
 }`}
                     </pre>
-                    {/* Blinking cursor */}
                     <div className="absolute bottom-6 left-4 w-2 h-4 bg-amber-500/50 animate-pulse z-20"></div>
                 </div>
             </div>
@@ -124,6 +136,7 @@ export default function SecretReportPage() {
                         <h3 className="text-sm font-bold text-white uppercase tracking-wide">Manual Adjustment Required</h3>
                         <p className="text-xs text-neutral-500 mt-1 max-w-lg leading-relaxed">
                             Automatic reconciliation failed due to checksum error. 
+                            Operator must calculate and input the missing <span className="text-neutral-300 font-bold">Variance Amount</span> to restore DB consistency.
                         </p>
                     </div>
                 </div>
@@ -156,12 +169,12 @@ export default function SecretReportPage() {
         </div>
 
         {/* FOOTER */}
-        <div className="bg-neutral-900 p-2 text-center border-t border-neutral-800 flex justify-between px-6">
-            <div className="flex items-center gap-2 text-[10px] text-neutral-600 font-mono">
+        <div className="bg-neutral-900/50 p-2 text-center border-t border-neutral-800 flex justify-between px-6">
+            <div className="flex items-center gap-2 text-[10px] text-slate-600 font-mono">
                 <Database size={10} />
                 HOST: AWS_US_EAST_1
             </div>
-            <div className="flex items-center gap-2 text-[10px] text-neutral-600 font-mono">
+            <div className="flex items-center gap-2 text-[10px] text-slate-600 font-mono">
                 <Lock size={10} />
                 TLS_1.3_ENCRYPTED
             </div>
